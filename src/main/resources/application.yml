@@ -23,12 +23,29 @@ resilience4j:
         permittedNumberOfCallsInHalfOpenState : 1
         waitDurationInOpenState: 5000
     instances:
+      # Define the circuit breaker instance for a specific service
       helloService:
         sliding-window-type: COUNT_BASED
+        
+        #  Failure rate threshold is set to 50%, meaning that if 50% or more of the requests within the sliding window (last 5 requests) fail, the circuit breaker will open.
         failure-rate-threshold: 50
+        
+        # Specifies the minimum number of requests that must be made before the circuit breaker starts evaluating the failure rate.
+        # In this case, it waits for at least 5 calls before deciding whether to open the circuit.
         minimum-number-of-calls: 5
         automatic-transition-from-open-to-half-open-enabled: true
-        wait-duration-in-open-state: 5s
+        
+        # Defines how long the circuit breaker will stay open before it transitions to the half-open state. In this case, the circuit remains open for 10 seconds.
+        wait-duration-in-open-state: 10s
+        
+        # When the circuit is in the half-open state, this property defines how many calls are allowed to pass through to test if the service is back to normal.
+        # In this case, 3 calls are allowed.
         permitted-number-of-calls-in-half-open-state: 3
-        sliding-window-size: 10
+        
+        #  Defines the size of the sliding window for measuring the failure rate of requests.
+        # In this case, it tracks the last 5 requests to decide whether the failure rate has exceeded the threshold.
+        sliding-window-size: 5
+        
+        # Whether the circuit breaker will be registered as a health indicator.
+        # When set to true, it allows the circuit breaker to expose its health status, which can be monitored through Spring Boot Actuator.
         register-health-indicator: true
