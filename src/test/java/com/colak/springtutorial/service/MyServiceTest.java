@@ -1,4 +1,4 @@
-package com.colak.springcloudcircuitbreakertutorial.service;
+package com.colak.springtutorial.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Awaitility;
