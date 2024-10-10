@@ -8,19 +8,19 @@ import org.springframework.stereotype.Service;
 @Slf4j
 class MyService {
 
-    @CircuitBreaker(name = "helloService", fallbackMethod = "fallbackHello")
-    public String sayHello() {
-        // Simulate a service call
-        if (Math.random() > 0.9) {
-            log.info("exception");
-            throw new RuntimeException("Service call failed");
+    public static final String FALLBACK_MESSAGE = "Fallback response: Service is down";
+
+    @CircuitBreaker(name = "helloServiceCircuitBreaker", fallbackMethod = "fallback")
+    public String sayHello(boolean throwException) {
+        // Simulate a failure
+        if (throwException) {
+            throw new RuntimeException("Service is currently unavailable");
         }
-        log.info("success");
-        return "Hello from service";
+        return "Hello";
     }
 
-    public String fallbackHello(Throwable throwable) {
+    public String fallback(boolean throwException, Throwable throwable) {
         log.info("Fallback");
-        return "Fallback: Hello from service";
+        return FALLBACK_MESSAGE;
     }
 }

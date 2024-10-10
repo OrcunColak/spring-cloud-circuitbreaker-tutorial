@@ -36,13 +36,13 @@ resilience4j:
         waitDurationInOpenState: 10s
     instances:
       # Define the circuit breaker instance for a specific service
-      helloService:
+      helloServiceCircuitBreaker:
         baseConfig: default
-      
         # Specifies the minimum number of requests that must be made before the circuit breaker starts evaluating the failure rate.
         # In this case, it waits for at least 5 calls before deciding whether to open the circuit.
-        minimum-number-of-calls: 5
-        
+        minimum-number-of-calls: 3
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 2
         automatic-transition-from-open-to-half-open-enabled: true
     
         

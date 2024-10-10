@@ -1,12 +1,13 @@
 package com.colak.springtutorial.service;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Slf4j
@@ -15,26 +16,43 @@ class MyServiceTest {
     @Autowired
     private MyService myService;
 
+    @Autowired
+    private CircuitBreakerRegistry circuitBreakerRegistry;
+
     @Test
     void testSayHello() {
-        AtomicInteger counter = new AtomicInteger();
-        Awaitility.await()
-                .until(() -> {
-                    log.info("Call : {}", counter.getAndIncrement());
 
-                    boolean result = false;
-                    try {
-                        String str = myService.sayHello();
-                        result = "Fallback: Hello from service".equals(str);
-                    } catch (Exception _) {
-                    }
-                    return result;
-                });
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("helloServiceCircuitBreaker");
 
-        // Some of these calls will 90% throw exception
-        for (int index = 0; index < 20; index++) {
-            myService.sayHello();
+        for (int index = 0; index < 5; index++) {
+            try {
+                myService.sayHello(true);
+            } catch (Exception exception) {
+                // Ignoring the exception to continue testing
+            }
         }
+
+        // The circuit should now be in OPEN state
+        assertEquals(CircuitBreaker.State.OPEN, circuitBreaker.getState());
+
+        // Wait for the circuit breaker to transition to HALF_OPEN state
+        try {
+            Thread.sleep(6000); // Wait for longer than the waitDurationInOpenState (5 seconds)
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // The circuit should now be in HALF_OPEN state
+        assertEquals(CircuitBreaker.State.HALF_OPEN, circuitBreaker.getState());
+
+        // Make a successful calls to transition to CLOSED state
+        for (int index = 0; index < 2; index++) {
+            myService.sayHello(false); // Simulate a successful call
+
+        }
+
+        // The circuit should now transition back to CLOSED state
+        assertEquals(CircuitBreaker.State.CLOSED, circuitBreaker.getState());
 
     }
 }
