@@ -25,11 +25,8 @@ class MyServiceTest {
         CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("helloServiceCircuitBreaker");
 
         for (int index = 0; index < 5; index++) {
-            try {
-                myService.sayHello(true);
-            } catch (Exception exception) {
-                // Ignoring the exception to continue testing
-            }
+            String result = myService.sayHello(true);
+            assertEquals(MyService.FALLBACK_MESSAGE, result);
         }
 
         // The circuit should now be in OPEN state
@@ -48,7 +45,6 @@ class MyServiceTest {
         // Make a successful calls to transition to CLOSED state
         for (int index = 0; index < 2; index++) {
             myService.sayHello(false); // Simulate a successful call
-
         }
 
         // The circuit should now transition back to CLOSED state
