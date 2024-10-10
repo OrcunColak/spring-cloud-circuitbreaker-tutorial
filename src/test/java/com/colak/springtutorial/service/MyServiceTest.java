@@ -31,6 +31,7 @@ class MyServiceTest {
                     return result;
                 });
 
+        // Some of these calls will 90% throw exception
         for (int index = 0; index < 20; index++) {
             myService.sayHello();
         }

@@ -16,8 +16,8 @@ resilience4j:
   circuitbreaker:
     configs:
       default:
-        # Whether the circuit breaker will be registered as a health indicator.
-        # When set to true, it allows the circuit breaker to expose its health status, which can be monitored through Spring Boot Actuator.
+        # When set to true, Resilience4J will register a health indicator bean for each circuit breaker.
+        # This health indicator provides information about the state of the circuit breaker, including whether it's closed, open, or half-open.
         registerHealthIndicator: true
         slidingWindowType: COUNT_BASED
         
