@@ -44,11 +44,11 @@ class MyServiceTest {
 
         // Make a successful calls to transition to CLOSED state
         for (int index = 0; index < 2; index++) {
-            myService.sayHello(false); // Simulate a successful call
+            String result = myService.sayHello(false);// Simulate a successful call
+            assertEquals(MyService.HELLO_MESSAGE, result);
         }
 
         // The circuit should now transition back to CLOSED state
         assertEquals(CircuitBreaker.State.CLOSED, circuitBreaker.getState());
-
     }
 }

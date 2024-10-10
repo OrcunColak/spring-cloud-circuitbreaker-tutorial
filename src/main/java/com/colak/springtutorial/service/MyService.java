@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 class MyService {
 
+    public static final String HELLO_MESSAGE = "Hello";
     public static final String FALLBACK_MESSAGE = "Fallback response: Service is down";
 
     @CircuitBreaker(name = "helloServiceCircuitBreaker", fallbackMethod = "fallback")
@@ -16,7 +17,7 @@ class MyService {
         if (throwException) {
             throw new RuntimeException("Service is currently unavailable");
         }
-        return "Hello";
+        return HELLO_MESSAGE;
     }
 
     public String fallback(boolean throwException, Throwable throwable) {
